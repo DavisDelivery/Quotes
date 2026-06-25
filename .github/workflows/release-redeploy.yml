@@ -1,0 +1,41 @@
+# Redeploy both consuming apps when a new package version is released.
+#
+# On a published GitHub Release (or a pushed v* tag), this pings the Netlify
+# build hook for each app so they reinstall this package at the new ref and
+# redeploy. One release here -> MarginIQ and the dispatch map both rebuild.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   NETLIFY_HOOK_MARGINIQ      build hook URL for davis-marginiq.netlify.app
+#   NETLIFY_HOOK_DISPATCH_MAP  build hook URL for dd-dispatch-map.netlify.app
+name: release-redeploy
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger MarginIQ redeploy
+        env:
+          HOOK: ${{ secrets.NETLIFY_HOOK_MARGINIQ }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "NETLIFY_HOOK_MARGINIQ is not set — skipping MarginIQ redeploy."
+          else
+            curl -fsS -X POST -d '{}' "$HOOK" && echo "MarginIQ build hook triggered."
+          fi
+
+      - name: Trigger dispatch-map redeploy
+        env:
+          HOOK: ${{ secrets.NETLIFY_HOOK_DISPATCH_MAP }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "NETLIFY_HOOK_DISPATCH_MAP is not set — skipping dispatch-map redeploy."
+          else
+            curl -fsS -X POST -d '{}' "$HOOK" && echo "Dispatch-map build hook triggered."
+          fi

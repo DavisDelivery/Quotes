@@ -1,16 +1,21 @@
 {
   "name": "@davisdelivery/quote-generator",
   "private": true,
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Uline final-mile LTL quote generator for Davis Delivery Service. Reverse-engineered rate model (ZIP zone + per-CWT weight curve + skid/loose residual; fuel and margin on top). Runs standalone and embeds as a tab in other Davis apps.",
   "type": "module",
   "main": "./lib/quote-generator.js",
   "module": "./lib/quote-generator.js",
   "exports": {
-    ".": { "import": "./lib/quote-generator.js" },
+    ".": {
+      "import": "./lib/quote-generator.js"
+    },
     "./model.json": "./src/model.json"
   },
-  "files": ["lib", "src"],
+  "files": [
+    "lib",
+    "src"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -9,7 +9,7 @@ import G from "./geo.json";
 // controls, switchable accent. Pricing model from 226,073 Uline
 // DAS shipments (Jan 2025 – Jun 2026). Customer profiles persist via browser storage.
 // ─────────────────────────────────────────────────────────────
-const APP_VERSION = "v0.13";
+const APP_VERSION = "v0.14";
 
 // Flat accessorial fees added on top of the freight quote (not fueled, not marked up).
 const ACCESSORIALS = [
@@ -160,12 +160,6 @@ const CSS = `
 .rc-right{ display:flex;align-items:center;gap:var(--s3); }
 .rc-ver{ font-size:11px;font-weight:600;color:var(--muted);padding:3px 9px;border-radius:var(--pill);background:var(--card);box-shadow:0 1px 6px rgba(0,0,0,.05); }
 
-/* accent picker */
-.rc-accents{ display:inline-flex;gap:6px;padding:5px 7px;background:var(--card);border-radius:var(--pill);box-shadow:0 1px 6px rgba(0,0,0,.05); }
-.rc-acc{ width:16px;height:16px;border-radius:50%;transition:transform var(--t),box-shadow var(--t);box-shadow:0 0 0 0 rgba(0,0,0,0); }
-.rc-acc:hover{ transform:scale(1.15); }
-.rc-acc.on{ box-shadow:0 0 0 2px var(--card),0 0 0 4px currentColor;transform:scale(1.05); }
-.rc-acc:focus-visible{ outline:none;box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--ink); }
 
 /* tabs */
 .rc-tabs{ display:flex;gap:var(--s1);background:#eceef3;border-radius:var(--pill);padding:5px;margin-bottom:var(--s5); }

@@ -113,3 +113,46 @@ narrow:
 Accessorials are not a quote-accuracy gap: only ~1.4% of orders carry one, and
 they are returns / reconsignments billed as another minimum charge — not
 foreseeable at quote time.
+
+## 7. Scaling beyond the data: the distance regime
+
+The Uline data only spans **~0–81 miles** from the depot (dense to ~55), and
+within it the rate is nearly flat — the implied distance gradient is real but
+shallow (r≈0.4, ~$0.14/mi at the minimum charge). That is a *delivery-area*
+slope, not a *linehaul* slope, so it cannot be extended to price Augusta
+(~115 mi), Macon (~91), Greenville SC (~94), Columbia SC (~158), or Savannah
+(~211). Beyond the data, any number is an extrapolation, not a Uline fact.
+
+So the model runs in two regimes, decided per ZIP:
+
+- **data** — ZIP is in the Uline billing data. Priced by the data-backed model
+  (zone + weight curve + residual). Unchanged from §3.
+- **nearby** — ZIP isn't in the data but a neighboring 3-digit prefix is, and it
+  is within the envelope. Priced from the nearby zone (the existing prefix
+  fallback). Labeled "nearby estimate".
+- **oa (out-of-area)** — beyond the envelope, or a prefix we have no data for.
+  Priced as the farthest data-backed zone (Z3) at that weight **plus a per-mile
+  linehaul for the distance past the envelope**, then fuel and margin as normal:
+
+  ```
+  linehaul = Z3_weight_curve(weight) + oaPerMile x max(0, distance - dataRadiusMi)
+  ```
+
+  Distance is the great-circle miles from the depot (`origin`) to the ZIP
+  centroid (`src/geo.json`, Census ZCTA centroids: every ZIP within 200 mi of the depot plus all of GA + SC, ~2,156 ZIPs). Every
+  out-of-area quote is flagged in the UI and carries a confidence note; it is a
+  defensible distance-scaled estimate, not a data-backed rate.
+
+Three parameters in `model.json` tune this and are the levers to refine as real
+far-lane data arrives (they need no code change, and flow through `modelUrl`):
+
+| Param | Default | Meaning |
+| --- | --- | --- |
+| `origin` | `[34.12, -83.79]` | depot lat/lng (Buford / Braselton) — the distance basis |
+| `dataRadiusMi` | `80` | edge of the data envelope; beyond this a ZIP is out-of-area |
+| `oaPerMile` | `1.75` | de-fueled $/mile added per mile beyond the envelope (~$2.24/mi at 28% fuel) |
+
+Calibration: as Davis books real loads to far ZIPs (or gets competitor/Uline
+quotes for them), compare the booked rate to the model's out-of-area figure and
+adjust `oaPerMile` (and `dataRadiusMi` if the envelope shifts). Each real far
+data point makes the extrapolation less of an assumption.

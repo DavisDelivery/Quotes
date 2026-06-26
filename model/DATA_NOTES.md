@@ -51,3 +51,19 @@ python3 model/build/pull_das.py 2026-01-01 2026-06-23   # 2026 to date
 Pulls write to `data/das_<start>_<end>.json`. The `data/` directory and any
 `*.csv` are git-ignored — raw billing is never committed. Only the derived
 `src/model.json` ships.
+
+## ZIP centroids (distance regime)
+
+`src/geo.json` maps ZIP -> `[lat, lng]` for the area we quote (every ZIP
+within 200 mi of the depot plus all of GA + SC, ~2,156 ZIPs), used to compute depot-to-destination distance for
+out-of-area pricing. Source is the public U.S. Census ZCTA Gazetteer.
+
+Rebuild / add states:
+
+```bash
+python3 model/build/build_geo.py        # edit RADIUS_MI / KEEP_WHOLE to change coverage
+```
+
+`geo.json` is a static lookup (it changes only when the Census updates
+centroids), so it is committed alongside the model rather than rebuilt from
+billing data.
